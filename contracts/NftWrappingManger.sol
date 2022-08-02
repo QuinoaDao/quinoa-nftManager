@@ -66,7 +66,7 @@ contract NftWrappingManager is ERC4907, INFTWrappingManager{
     }
 
     ///@dev only router can update tokenURI
-    function updateTokenURI(uint256 tokenId, uint256 amount) onlyRouter public {
+    function _updateTokenURI(uint256 tokenId, uint256 amount) internal {
         string memory newURI = _createURI(amount);
         _setTokenURI(tokenId, newURI);
         emit NFTImageUpdated(tokenId);
@@ -102,7 +102,7 @@ contract NftWrappingManager is ERC4907, INFTWrappingManager{
 
         } else{ // partial withdraw. update Nft info
             _deposits[tokenId].qTokenAmount -= amount;
-            updateTokenURI(tokenId, _deposits[tokenId].qTokenAmount);
+            _updateTokenURI(tokenId, _deposits[tokenId].qTokenAmount);
         }
         IERC20(vault).transfer(router, amount);
         
@@ -146,7 +146,7 @@ contract NftWrappingManager is ERC4907, INFTWrappingManager{
         _deposits[tokenId] = _deposit;
         _tokenIdCounter.increment();
         _safeMint(user,tokenId);
-        updateTokenURI(tokenId, qTokenAmount);
+        _updateTokenURI(tokenId, qTokenAmount);
     }
 
     function deposit (
@@ -155,7 +155,7 @@ contract NftWrappingManager is ERC4907, INFTWrappingManager{
     ) onlyRouter external
     {
         _deposits[tokenId].qTokenAmount += qTokenAmount;
-        updateTokenURI(tokenId, _deposits[tokenId].qTokenAmount);
+        _updateTokenURI(tokenId, _deposits[tokenId].qTokenAmount);
     }
     
 }
